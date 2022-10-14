@@ -1,7 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 export const getServerSideProps = async (pageContext) => {
-  const pageSlug = pageContext.query.slug;
 
   const url = process.env.ENDPOINT;
   const graphQLClient = new GraphQLClient(url, {
@@ -9,10 +8,13 @@ export const getServerSideProps = async (pageContext) => {
       Authorization: process.env.GRAPH_CMS_TOKEN,
     },
   });
+  const pageSlug = pageContext.query.slug;
 
   const query = gql`
-    query {
-      videos(where: { slug: "jaws" }) {
+    query($pageSlug: String!) {
+      video(where: { 
+        slug: $pageSlug 
+        }) {
         createdAt
         id
         title
@@ -29,9 +31,23 @@ export const getServerSideProps = async (pageContext) => {
       }
     }
   `;
+
+  const variables = {
+    pageSlug,
+  };
+
+  const data = await graphQLClient.request(query, variables);
+  const video = data.video;
+
+  return {
+    props: {
+      video,
+    },
+  };
 };
 
-const Video = () => {
+const Video = ({ video }) => {
+  console.log(video);
   return <div></div>;
 };
 
