@@ -1,16 +1,16 @@
-import {gql,GraphQLClient} from 'graphql-request'
+import { gql, GraphQLClient } from 'graphql-request';
+
 
 export const getStaticProps = async () => {
-
-  const url = process.env.ENDPOINT
+  const url = process.env.ENDPOINT;
 
   const graphQLClient = new GraphQLClient(url, {
     headers: {
-      "Authorization" : process.env.GRAPH_CMS_TOKEN
-    }
-  })
+      Authorization: process.env.GRAPH_CMS_TOKEN,
+    },
+  });
 
-const query = gql`
+  const query = gql`
     query {
       videos {
         createdAt,
@@ -28,29 +28,41 @@ const query = gql`
         }
       }
     }
-    `
+  `;
 
-const data = await graphQLClient.request(query)
-const videos = data.videos
+  const data = await graphQLClient.request(query);
+  const videos = data.videos;
 
-console.log(data)
 
-return {
-  props: {
-    videos
-  }
-}
+  console.log(data);
 
-}
-const Home = ({videos})  => {
+  return {
+    props: {
+      videos,
+    },
+  };
+};
 
-  console.log(videos)
+const Home = ({ videos }) => {
+
+  const randomVideo = (videos) => {
+    return videos[Math.floor(Math.random() * videos.length)];
+    
+  };
 
   return (
-    <div>
-      Hello Paul !
-    </div>
-  )
-}
 
-export default Home
+    <>
+      <div className="app">
+        <div className="main-video">
+          <img
+            src={randomVideo(videos).thumbnail.url} 
+            alt={randomVideo(videos).title} 
+          />
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Home;
